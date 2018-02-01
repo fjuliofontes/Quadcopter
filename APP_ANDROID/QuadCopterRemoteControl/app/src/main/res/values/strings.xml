@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">QuadCopterRemoteControl</string>
+    <string name="textview1">TextView1</string>
+    <string name="my_menu_item">More info contact juliofontes@ua.pt!</string>
+    <string name="switch_1_name"> Power </string>
+    <string name="textview_log">Empty!</string>
+    <string name="log">LOG:</string>
+    <string name="warning">Better Performance in LANDSCAPE!!!</string>
+</resources>
