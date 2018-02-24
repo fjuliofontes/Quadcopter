@@ -41,16 +41,16 @@ void loop(){
     if(first_time && change_ch_enable){
       switch ((receiver_decision_2<<1) | receiver_decision_1) {
         case 0:
-          receiver_input_channel_1_f=(int)((( receiver_input_channel_5 << 4) | ( receiver_input_channel_4 << 3) | ( receiver_input_channel_3 << 2) | ( receiver_input_channel_2 << 1) | receiver_input_channel_1)*32.258) + 1000;
+          receiver_input_channel_1_f=(int)((( receiver_input_channel_5 << 4) | ( receiver_input_channel_4 << 3) | ( receiver_input_channel_3 << 2) | ( receiver_input_channel_2 << 1) | receiver_input_channel_1)*(500/15)) + 1000;
           break;
         case 1:
-          receiver_input_channel_2_f=(int)((( receiver_input_channel_5 << 4) | ( receiver_input_channel_4 << 3) | ( receiver_input_channel_3 << 2) | ( receiver_input_channel_2 << 1) | receiver_input_channel_1)*32.258) + 1000;
+          receiver_input_channel_2_f=(int)((( receiver_input_channel_5 << 4) | ( receiver_input_channel_4 << 3) | ( receiver_input_channel_3 << 2) | ( receiver_input_channel_2 << 1) | receiver_input_channel_1)*(500/15)) + 1000;
           break;
         case 2:
-          receiver_input_channel_3_f=(int)((( receiver_input_channel_5 << 4) | ( receiver_input_channel_4 << 3) | ( receiver_input_channel_3 << 2) | ( receiver_input_channel_2 << 1) | receiver_input_channel_1)*32.258) + 1000;
+          receiver_input_channel_3_f=(int)((( receiver_input_channel_5 << 4) | ( receiver_input_channel_4 << 3) | ( receiver_input_channel_3 << 2) | ( receiver_input_channel_2 << 1) | receiver_input_channel_1)*(500/15)) + 1000;
           break;
         case 3:
-          receiver_input_channel_4_f=(int)((( receiver_input_channel_5 << 4) | ( receiver_input_channel_4 << 3) | ( receiver_input_channel_3 << 2) | ( receiver_input_channel_2 << 1) | receiver_input_channel_1)*32.258) + 1000;
+          receiver_input_channel_4_f=(int)((( receiver_input_channel_5 << 4) | ( receiver_input_channel_4 << 3) | ( receiver_input_channel_3 << 2) | ( receiver_input_channel_2 << 1) | receiver_input_channel_1)*(500/15)) + 1000;
           break;
       }
       first_time=0;
@@ -97,7 +97,7 @@ ISR (PCINT2_vect){
     last_decision_2 = 0;                                        //Remember current input state
     receiver_decision_2 = last_decision_2;         //Channel 2 is current_time - timer_2
   }
-  
+
 }
 
 
@@ -111,7 +111,7 @@ ISR(PCINT0_vect){
   }
   else if(last_decision_0 == 1){                                //Input 13 is not high and changed from 1 to 0
     last_decision_0 = 0;                                        //Remember current input state
-    change_ch_enable = last_decision_0;                       
+    change_ch_enable = last_decision_0;
   }
   //Channel 1=========================================
   if(PINB & B00000001){                                        //Is input 8 high?
