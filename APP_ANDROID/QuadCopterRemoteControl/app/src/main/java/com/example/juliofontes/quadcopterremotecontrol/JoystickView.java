@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -137,10 +138,10 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
 
             }
             else {
-                if(getId() == R.id.joystickRight){ // we want that left joystick return always to the center
+                if(getId() == R.id.joystickRight){ // we want that right joystick return always to the center
                     drawJoystick(centerX, centerY); // return to center
-                    for(int i = 0 ; i < 5 ; i++) // center is important to left joystick
-                        sendCoords(centerX,centerY); //this is a ensurance that the coord will be proprely send
+                    for(int i = 0 ; i < 5 ; i++) // center is important to right joystick
+                        sendCoords(centerX,centerY); //this is a ensure that the coords will be proprely send
                 }
             }
         }
@@ -148,11 +149,11 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
     }
 
     public interface JoystickListener{
-        void onJoystickMoved(float xPercent, float yPercent, int id);
+        void onJoystickMoved(int xPercent, int yPercent, int id);
     }
 
     public void sendCoords(float valX, float valY){
-        joystickCallback.onJoystickMoved((float)((valX*31)/getWidth()),(float)((valY*31)/getHeight()),getId());
+        joystickCallback.onJoystickMoved((int)((valX*31)/getWidth()),(int)((valY*31)/getHeight()),getId());
     }
 
     /*  -------------
