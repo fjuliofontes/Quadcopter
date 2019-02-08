@@ -22,8 +22,8 @@ import java.util.jar.Attributes;
 
 public class JoystickView extends SurfaceView implements SurfaceHolder.Callback, View.OnTouchListener {
 
-    private float centerX;
-    private float centerY;
+    private float centerX, centerY;
+    private float finalx, finaly;
     //private float baseRadius;
     private float hatRadius;
 
@@ -34,7 +34,7 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
         centerX = getWidth() / 2;
         centerY = getHeight() / 2;
         //baseRadius = Math.min(getWidth(),getHeight()) / 2;
-        hatRadius = Math.min(getWidth(),getHeight()) / 5;
+        hatRadius = Math.min(getWidth(),getHeight()) / 8;
     }
 
     public JoystickView(Context context){
@@ -143,6 +143,18 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
                     for(int i = 0 ; i < 5 ; i++) // center is important to right joystick
                         sendCoords(centerX,centerY); //this is a ensure that the coords will be proprely send
                 }
+                else{
+                    if(e.getY() >= 0 && e.getY() < getHeight()){
+                        drawJoystick(centerX,e.getY()); // return only the X coordenate to the center
+                        for(int i = 0 ; i < 5 ; i++) // center is important to right joystick
+                            sendCoords(centerX,e.getY()); //this is a ensure that the coords will be propely send
+                    }
+                    else{
+                        drawJoystick(centerX,finaly); // return only the X coordenate to the center
+                        for(int i = 0 ; i < 5 ; i++) // center is important to right joystick
+                            sendCoords(centerX,finaly); //this is a ensure that the coords will be propely send
+                    }
+                }
             }
         }
         return true;
@@ -165,8 +177,6 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
         -------------
     */
     public void computeCoords(float valx, float valy){
-        float finalx = 0;
-        float finaly = 0;
         if(( valx >= centerX) && (valy <= centerY) ){ // zone 2
             if((valx >= getWidth()) && (valy >= 0)){ // Aresta Vertical Right
                 //drawJoystick(getWidth(), valy);

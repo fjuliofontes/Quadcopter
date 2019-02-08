@@ -5,64 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/im3"
-    tools:context="com.example.juliofontes.quadcopterremotecontrol.RemoteControl">
-
-    <Switch
-        android:id="@+id/switch1"
-        android:layout_width="104dp"
-        android:layout_height="32dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:checked="false"
-        android:text="@string/switch_1_name"
-        android:textStyle="bold"
-        android:textColor="#000"
-        app:layout_constraintBottom_toTopOf="@+id/joystickRight"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.84"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.496" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="350dp"
-        android:layout_height="32dp"
-        android:layout_marginBottom="62dp"
-        android:layout_marginEnd="17dp"
-        android:layout_marginStart="17dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/textview_log"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.997" />
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="35dp"
-        android:layout_height="23dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginEnd="333dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="280dp"
-        android:text="@string/log"
-        android:textStyle="bold"
-        android:textColor="#000"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    tools:context="com.example.juliofontes.quadcopterremotecontrol.RemoteControl"
+    tools:layout_editor_absoluteY="81dp">
 
     <com.example.juliofontes.quadcopterremotecontrol.JoystickView
         android:id="@+id/joystickLeft"
         android:layout_width="170dp"
-        android:layout_height="170dp"
+        android:layout_height="200dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="25dp"
         android:layout_marginStart="25dp"
@@ -75,7 +24,7 @@
     <com.example.juliofontes.quadcopterremotecontrol.JoystickView
         android:id="@+id/joystickRight"
         android:layout_width="170dp"
-        android:layout_height="170dp"
+        android:layout_height="200dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="25dp"
         android:layout_marginStart="8dp"
@@ -90,15 +39,17 @@
         android:layout_width="120dp"
         android:layout_height="65dp"
         android:layout_marginBottom="8dp"
-        android:textColor="#F00"
-        android:textStyle="bold"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="@string/warning"
+        android:textColor="#F00"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/joystickLeft"
-        app:layout_constraintEnd_toStartOf="@+id/switch1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.169"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.522" />
 
 </android.support.constraint.ConstraintLayout>

@@ -1,8 +1,7 @@
 import RPi.GPIO as io
-import sys, tty, termios, time, os, glob
+import sys, tty, termios, time, os, glob, threading, thread , Queue
 from array import *
 from bluetooth import *
-import time
 
 #######INITS############################################
 io.setmode(io.BCM)
@@ -85,6 +84,9 @@ def startEngines():
         time.sleep(0.005)   # user delay 5ms
     pass
 
+def getData(var1,var2):
+    var2.put(client_sock.recv(1024)) # Start decoding data (polling method)
+
 #######################MAIN#############################
 server_sock=BluetoothSocket( RFCOMM )                   # Start bluetooth server
 server_sock.bind(("",PORT_ANY))                         # config bluetooth port
@@ -103,6 +105,8 @@ while 1:                                                # Main loop run's foreve
         client_sock, client_info = server_sock.accept()
         print "Accepted connection from ", client_info # At this point he stablish contact with android app
         run = True                                     # ok let's enter in loop
+        threads = []                                   #
+        q = Queue.Queue()                              # start a new Queue
     except KeyboardInterrupt:
         print "Aborted"
         run = False                                    # something happened :(
@@ -111,27 +115,38 @@ while 1:                                                # Main loop run's foreve
 
     while run:                                         # Secondary loop, runs just if there is a connected phone
         try:
-            data = client_sock.recv(1024)              # Start decoding data (polling method)
+            t = threading.Thread(target=getData,args=([],q))  # create the objects for the keepalive thread
+            threads.append(t)                          #
+            t.daemon = True                            # When the main thread stop every thread else also stop
+            t.start()                                  # Start a new thread only if there is no other running
+            t.join(2)                                  # Try to join the thread with a interval of 2 seconds
+            if (t.isAlive()):                          # If no response stop the engines
+                stopEngines()
+                print "The engines were stopped!"
+            while(t.isAlive()):                        # Keep trying getting data
+                t.join(1)                              # Wait until get again range allowing ctrl-c
+            data = q.get()                             # pick data from queue
             _assert(len(data) != 0)                    # check for bugs, because it's almost impossible fail
             if (data.find("done()") != -1):            # check for a termination signal from app()
                 run = False                            # stop the secundary loop
                 stopEngines()                          # Stop engines in case motors on, and back again to primary loop
                 break
-            #start_time = time.time()                  # if we want to count execution time
-            alldata = (data.split("\n"))               # Split the 1024 stored bytes ("\n"-> represents a termination)
-            pos = [0, int((len(alldata)-1)/2), len(alldata)-2] # Begin mid and End are the most important mensages
-            for i in range(0,3):                       # So execute the most important mensages
-                channels = alldata[pos[i]].split("_")  # Split the channel info ("_"-> represent's channel terminatio)
-                #print alldata[pos[i]]
-                #_assert(len(channels) == 4)           # check if Received all the channels
-                if(len(channels) == 4):                # to provide a better performance we just ignore the channels with less info
-                    for x in range(0,4):               # Send the values individualy to all the channels
-                        ch_val = channels[x].split(":")# Get the proprely value (":"-> represent's value termination)
-                        _assert(ch_val[0] == "CH"+str(x + 1))# check if we are sending to the correct channel
-                        ch_val = int(float(ch_val[1])) # convert the value to int
-                        _assert((ch_val >= 0) and (ch_val <= 31)) #check if is a valid value, inside the bounds
-                        sendValue(ch_val,x)            # send the desired value
-            #print("--- %s seconds ---" % (time.time() - start_time)) # print the time needed to the complete process
+            if(data.find("on") == -1):                     # Ignore keepalive mensages
+                #start_time = time.time()                  # if we want to count execution time
+                alldata = (data.split("\n"))               # Split the 1024 stored bytes ("\n"-> represents a termination)
+                pos = [0, int((len(alldata)-1)/2), len(alldata)-2] # Begin mid and End are the most important mensages
+                for i in range(0,3):                       # So execute the most important mensages
+                    channels = alldata[pos[i]].split("_")  # Split the channel info ("_"-> represent's channel terminatio)
+                    #print alldata[pos[i]]
+                    #_assert(len(channels) == 4)           # check if Received all the channels
+                    if(len(channels) == 4):                # to provide a better performance we just ignore the channels with less info
+                        for x in range(0,4):               # Send the values individualy to all the channels
+                            ch_val = channels[x].split(":")# Get the proprely value (":"-> represent's value termination)
+                            _assert(ch_val[0] == "CH"+str(x + 1))# check if we are sending to the correct channel
+                            ch_val = int(float(ch_val[1])) # convert the value to int
+                            _assert((ch_val >= 0) and (ch_val <= 31)) #check if is a valid value, inside the bounds
+                            sendValue(ch_val,x)            # send the desired value
+                #print("--- %s seconds ---" % (time.time() - start_time)) # print the time needed to the complete process
         except IOError:
             pass
         except KeyboardInterrupt:

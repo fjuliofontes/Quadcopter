@@ -124,6 +124,10 @@ while 1:                        # Main loop run's forever until a KeyboardInterr
     elif(k == 65):              # Arrow down
         if(throttle > 0):       # If already reach the zero it's no needed to decrement
             throttle = throttle - 1
+    elif(k == 111):             # key = 'o'
+        throttle = 0            # Maximum throttle
+    elif(k == 112):             # key = 'p'
+        throttle = 31           # Minimum position
 
     if((oldthrottle != throttle) and start):
         _assert((throttle >= 0) and (throttle <= 31))

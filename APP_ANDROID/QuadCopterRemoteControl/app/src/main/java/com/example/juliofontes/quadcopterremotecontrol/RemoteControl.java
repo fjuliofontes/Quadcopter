@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.util.Queue;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.Timer;
 import java.util.UUID;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -20,6 +21,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -34,19 +36,20 @@ public class RemoteControl extends AppCompatActivity implements JoystickView.Joy
     BluetoothSocket mmSocket;
     BluetoothDevice mmDevice = null;
 
-    double coe6 = 0.96513;
-    int coe5 = 98;
-    int coe4 = 3613;
-    int coe3 = 58840;
-    int coe2 = 441530;
-    int coe1 = 917480;
-    int coe0 = 259100;
+    double coe6 = 0.965126;
+    double coe5 = 81.5120;
+    double coe4 = 2335.08;
+    int    coe3 = 22422;
+    int    coe2 = 23851;
+    int    coe1 = 614913;
+    int    coe0 = 232848;
 
     boolean connectionStatus = false;
     boolean isSmooth = false;
+    boolean isKeepAlive = false , channelFree = false;
 
     public int smooth_val(int val){
-        int res =  (int)((coe6*Math.pow(val,6) - coe5*Math.pow(val,5) + coe4*Math.pow(val,4) - coe3*Math.pow(val,3) + coe2*val*val - coe1*val + coe0)/1000000.0);
+        int res =  (int)((-coe6*Math.pow(val,6) + coe5*Math.pow(val,5) - coe4*Math.pow(val,4) + coe3*Math.pow(val,3) + coe2*val*val + coe1*val + coe0)/1000000.0);
         return res;
     }
 
@@ -111,118 +114,53 @@ public class RemoteControl extends AppCompatActivity implements JoystickView.Joy
         return flag;
     }
 
-    public void portrait(){
-        /*TextView and bluetooth stuff*/
-        final TextView logger = (TextView) findViewById(R.id.textView2);
-        final Switch on_off = (Switch) findViewById(R.id.switch1);
-        /*End of inicializations */
-
-        final class workerThread implements Runnable {
-            float old_ch1 = 0,old_ch2 = 0,old_ch3 = 0,old_ch4 = 0;
-            String msg;
-            public void run() {
-                while(run) {
-                    if(ch1val != old_ch1 || ch2val != old_ch2 || ch3val != old_ch3 || ch4val != old_ch4) {
-                        old_ch1 = ch1val;
-                        old_ch2 = ch2val;
-                        old_ch3 = ch3val;
-                        old_ch4 = ch4val;
-                        msg = "CH1:" + (int) ch1val + "_CH2:" + (int) ch2val + "_CH3:" + (int) ch3val + "_CH4:" + (int) ch4val + "\n";
-                        sendBtMsg(msg);
-                        try { // sleep 1ms in order to complete the mensage sending
-                            Thread.sleep(1);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+    final class workerThread implements Runnable {
+        float old_ch1 = 0,old_ch2 = 0,old_ch3 = 0,old_ch4 = 0;
+        String msg;
+        public void run() {
+            while(run) {
+                if(ch1val != old_ch1 || ch2val != old_ch2 || ch3val != old_ch3 || ch4val != old_ch4) {
+                    channelFree = false;
+                    old_ch1 = ch1val;
+                    old_ch2 = ch2val;
+                    old_ch3 = ch3val;
+                    old_ch4 = ch4val;
+                    msg = "CH1:" + (int) ch1val + "_CH2:" + (int) ch2val + "_CH3:" + (int) ch3val + "_CH4:" + (int) ch4val + "\n";
+                    sendBtMsg(msg);
+                    //Log.d("workerThread", msg);
+                    try { // sleep 1ms in order to complete the mensage sending
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
             }
         }
+    }
 
-        on_off.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                logger.setText("Switch Changed!");
-                if(isChecked) {
-                    connectionStatus = establishBluetoothConnection();
-                    if(connectionStatus) {
-                        logger.setText("Connected to JulioPi");
-                        run = true;
-                        Thread t1 = new Thread(new workerThread());
-                        t1.start();
-                    }
-                    else {
-                        logger.setText("No JulioPi Detected");
-                    }
+    final class KeepAliveThread implements Runnable {
+        public void run() {
+            while (isKeepAlive) {
+                try { // sleep 1s to get periodicity of 1 second
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                else {
-                    if(run) {
-                        run = false;
-                        closeBt();
-                        logger.setText("quit()");
-                    }
-                    else {
-                        logger.setText("Switch Changed!");
-                    }
+                if(!channelFree){
+                    channelFree = true;
+                }
+                else{
+                    sendBtMsg("on");
+                    //Log.d("KeepAliveThread", "on");
                 }
             }
-        });
+        }
+    }
 
+
+    public void portrait(){
     }
     public void landscape(){
-        /*TextView and bluetooth stuff*/
-        final TextView logger = (TextView) findViewById(R.id.textView2);
-        final Switch on_off = (Switch) findViewById(R.id.switch1);
-        /*End of inicializations */
-
-        final class workerThread implements Runnable {
-            float old_ch1 = 0,old_ch2 = 0,old_ch3 = 0,old_ch4 = 0;
-            String msg;
-            public void run() {
-                while(run) {
-                    if(ch1val != old_ch1 || ch2val != old_ch2 || ch3val != old_ch3 || ch4val != old_ch4) {
-                        old_ch1 = ch1val;
-                        old_ch2 = ch2val;
-                        old_ch3 = ch3val;
-                        old_ch4 = ch4val;
-                        msg = "CH1:" + (int) ch1val + "_CH2:" + (int) ch2val + "_CH3:" + (int) ch3val + "_CH4:" + (int) ch4val + "\n";
-                        sendBtMsg(msg);
-                        try { // sleep 1ms in order to complete the mensage sending
-                            Thread.sleep(1);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }
-
-        on_off.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                logger.setText("Switch Changed!");
-                if(isChecked) {
-                    connectionStatus = establishBluetoothConnection();
-                    if(connectionStatus) {
-                        logger.setText("Connected to JulioPi");
-                        run = true;
-                        Thread t1 = new Thread(new workerThread());
-                        t1.start();
-                    }
-                    else {
-                        logger.setText("No JulioPi Detected");
-                    }
-                }
-                else {
-                    if(run) {
-                        run = false;
-                        closeBt();
-                        logger.setText("quit()");
-                    }
-                    else {
-                        logger.setText("Switch Changed!");
-                    }
-                }
-            }
-        });
     }
 
     @Override
@@ -233,11 +171,11 @@ public class RemoteControl extends AppCompatActivity implements JoystickView.Joy
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setContentView(R.layout.activity_remote_control);
             Toast.makeText(this, "landscape", Toast.LENGTH_SHORT).show();
-            landscape();
+            //landscape();
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
             setContentView(R.layout.activity_remote_control);
             Toast.makeText(this, "portrait", Toast.LENGTH_SHORT).show();
-            portrait();
+            //portrait();
         }
     }
     @Override
@@ -258,27 +196,17 @@ public class RemoteControl extends AppCompatActivity implements JoystickView.Joy
         switch (id){
             case R.id.joystickLeft:
                 //Log.d("Main Method","X percent" + xPercent + "Y percent" + yPercent);
-                if(isSmooth) {
-                    ch1val = smooth_val(xPercent);
-                    ch2val = smooth_val(yPercent);
-                }
-                else{
-                    ch1val = xPercent;
-                    ch2val = yPercent;
-                }
+                ch1val = xPercent;
+                ch2val = (isSmooth) ? smooth_val(yPercent) : yPercent;
                 break;
             case R.id.joystickRight:
                 //Log.d("Main Method","X percent" + xPercent + "Y percent" + yPercent);
-                if(isSmooth) {
-                    ch3val = smooth_val(xPercent);
-                    ch4val = smooth_val(yPercent);
-                }
-                else{
-                    ch3val = xPercent;
-                    ch4val = yPercent;
-                }
+                ch3val = xPercent;
+                ch4val = yPercent;
                 break;
         }
+
+        //Log.d("teste",""+ch2val);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -292,11 +220,41 @@ public class RemoteControl extends AppCompatActivity implements JoystickView.Joy
                 }else{
                     // If item is unchecked then checked it
                     item.setChecked(true);
-                    if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                    }
-                    else if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                    try {
+                        if(Integer.valueOf(android.os.Build.VERSION.SDK_INT) >= 8){
+                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+                                // setting the orientation as per the device orientation for API level 8+
+                                if(getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_0){
+                                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                                }else if(getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_180){
+                                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+                                }else if(getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_90){
+                                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+                                }else if(getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_270){
+                                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                                }
+                            }else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                                if(getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_0){
+                                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                                }else if(getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_180){
+                                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+                                }else if(getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_90){
+                                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                                }else if(getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_270){
+                                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+                                }
+                            }
+                        }else if(Integer.valueOf(android.os.Build.VERSION.SDK_INT) < 8){
+                            // setting the orientation as per the device orientation for API level below 8
+                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                            }else {
+                                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                            }
+
+                        }
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
                     }
                 }
                 return true;
@@ -309,6 +267,41 @@ public class RemoteControl extends AppCompatActivity implements JoystickView.Joy
                 else{
                     item.setChecked(true);
                     isSmooth = true;
+                }
+                return true;
+            case R.id.connect:
+                if(item.isChecked()){
+                    item.setChecked(false);
+                    run = false;
+                    closeBt();
+                    Toast.makeText(this, "quit()", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    connectionStatus = establishBluetoothConnection();
+                    if (connectionStatus){
+                        Toast.makeText(this, "Connected to JulioPi", Toast.LENGTH_SHORT).show();
+                        run = true;
+                        Thread t1 = new Thread(new workerThread());
+                        t1.setPriority(Thread.NORM_PRIORITY); // Norm priority to this thread
+                        t1.start();
+                    }
+                    else
+                        Toast.makeText(this, "No JulioPi Detected", Toast.LENGTH_SHORT).show();
+                    item.setChecked(connectionStatus);
+                }
+                return true;
+            case R.id.keepalive:
+                if(item.isChecked()){
+                    // If item already checked then unchecked it
+                    item.setChecked(false);
+                    isKeepAlive = false;
+                }
+                else{
+                    item.setChecked(true);
+                    isKeepAlive = true;
+                    Thread t2 = new Thread(new KeepAliveThread());
+                    t2.setPriority(Thread.MIN_PRIORITY); // Min priority to this thread
+                    t2.start();
                 }
                 return true;
             default:

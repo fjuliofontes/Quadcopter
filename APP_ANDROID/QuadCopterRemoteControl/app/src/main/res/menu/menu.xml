@@ -2,22 +2,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/connect"
+        android:title="Start Connection"
+        app:showAsAction="never"
+        android:orderInCategory="1"
+        android:checkable="true"
+        />
+    <item
         android:id="@+id/lock"
         android:title="Lock Screen"
         app:showAsAction="never"
-        android:orderInCategory="1"
+        android:orderInCategory="2"
         android:checkable="true"
         />
     <item
         android:id="@+id/smooth"
         android:title="Smooth Controller"
         app:showAsAction="never"
-        android:orderInCategory="2"
+        android:orderInCategory="3"
+        android:checkable="true"
+        />
+    <item
+        android:id="@+id/keepalive"
+        android:title="KeepAlive"
+        app:showAsAction="never"
+        android:orderInCategory="4"
         android:checkable="true"
         />
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="3"
+        android:orderInCategory="5"
         android:title="@string/my_menu_item" />
 
 </menu>
