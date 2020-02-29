@@ -28,8 +28,10 @@
   - schematic.pdf -> Schematic used for the quadcopter.
   
 #### Media:
-![Quadcopter Image](/images/quadcopter.png)
 [Youtube](https://www.youtube.com/watch?v=6dJKzOPGX_o)
+
+![Quadcopter Image](/images/quadcopter.png)
+
 
 ##### Some commands required to fire up the bluetooth in the raspberrry pi:
   * sudo bluetoothctl
