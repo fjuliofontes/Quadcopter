@@ -1,5 +1,5 @@
 *.o
-.DS_Store
+*.DS_Store
 *.sh
 *.backup
 *.mp4
