@@ -2,29 +2,45 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/bluetooth_status"
+        android:icon="@drawable/ic_bluetooth"
+        android:title="Connection Status"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
         android:id="@+id/connect"
-        android:title="Start Connection"
+        android:title="@string/connect"
         app:showAsAction="never"
         android:orderInCategory="1"
-        android:checkable="true"
-        />
+        android:checkable="true">
+        <menu>
+            <item android:id="@+id/subitem_dev1"
+            android:title="Name"/>
+            <item android:id="@+id/subitem_dev2"
+                android:title="Name"/>
+            <item android:id="@+id/subitem_dev3"
+                android:title="Name"/>
+        </menu>
+    </item>
+
     <item
         android:id="@+id/lock"
-        android:title="Lock Screen"
+        android:title="@string/lock"
         app:showAsAction="never"
         android:orderInCategory="2"
         android:checkable="true"
         />
     <item
         android:id="@+id/smooth"
-        android:title="Smooth Controller"
+        android:title="@string/smooth"
         app:showAsAction="never"
         android:orderInCategory="3"
         android:checkable="true"
         />
     <item
         android:id="@+id/keepalive"
-        android:title="KeepAlive"
+        android:title="@string/keepalive"
         app:showAsAction="never"
         android:orderInCategory="4"
         android:checkable="true"

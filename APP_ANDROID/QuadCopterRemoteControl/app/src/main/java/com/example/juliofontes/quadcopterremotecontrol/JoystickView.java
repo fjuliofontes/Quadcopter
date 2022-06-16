@@ -26,6 +26,7 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
     private float finalx, finaly;
     //private float baseRadius;
     private float hatRadius;
+    public static final int scale = 1250;
 
     private JoystickListener joystickCallback;
     //private final int ratio = 5; //the smaller, the more shading will occur
@@ -140,19 +141,16 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
             else {
                 if(getId() == R.id.joystickRight){ // we want that right joystick return always to the center
                     drawJoystick(centerX, centerY); // return to center
-                    for(int i = 0 ; i < 5 ; i++) // center is important to right joystick
-                        sendCoords(centerX,centerY); //this is a ensure that the coords will be proprely send
+                    sendCoords(centerX,centerY); //this is a ensure that the coords will be proprely send
                 }
                 else{
                     if(e.getY() >= 0 && e.getY() < getHeight()){
                         drawJoystick(centerX,e.getY()); // return only the X coordenate to the center
-                        for(int i = 0 ; i < 5 ; i++) // center is important to right joystick
-                            sendCoords(centerX,e.getY()); //this is a ensure that the coords will be propely send
+                        sendCoords(centerX,e.getY()); //this is a ensure that the coords will be propely send
                     }
                     else{
                         drawJoystick(centerX,finaly); // return only the X coordenate to the center
-                        for(int i = 0 ; i < 5 ; i++) // center is important to right joystick
-                            sendCoords(centerX,finaly); //this is a ensure that the coords will be propely send
+                        sendCoords(centerX,finaly); //this is a ensure that the coords will be propely send
                     }
                 }
             }
@@ -165,7 +163,7 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback,
     }
 
     public void sendCoords(float valX, float valY){
-        joystickCallback.onJoystickMoved((int)((valX*31)/getWidth()),(int)((valY*31)/getHeight()),getId());
+        joystickCallback.onJoystickMoved((int)((valX*scale)/getWidth()),(int)((valY*scale)/getHeight()),getId());
     }
 
     /*  -------------

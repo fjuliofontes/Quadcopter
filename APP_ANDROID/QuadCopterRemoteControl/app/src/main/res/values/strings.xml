@@ -6,4 +6,8 @@
     <string name="textview_log">Empty!</string>
     <string name="log">LOG:</string>
     <string name="warning">Better Performance in LANDSCAPE!!!</string>
+    <string name="connect">Start Connection</string>
+    <string name="lock">Lock Screen</string>
+    <string name="keepalive">KeepAlive</string>
+    <string name="smooth">Smooth Controller</string>
 </resources>
